@@ -1,11 +1,11 @@
-﻿[Console]::InputEncoding  = [System.Text.Encoding]::GetEncoding(857)
+[Console]::InputEncoding  = [System.Text.Encoding]::GetEncoding(857)
 [Console]::OutputEncoding = [System.Text.Encoding]::GetEncoding(857)
 chcp 857 | Out-Null
 
 if (-not $env:DBF_UPDATED) {
 
     $env:DBF_UPDATED = "1"
-    $CurrentVersion = "1.0.1"
+    $CurrentVersion = "1.0.2"
 
     $VersionUrl = "https://raw.githubusercontent.com/MakeUsDream/DBNameFinder/main/version.txt"
     $ScriptUrl  = "https://raw.githubusercontent.com/MakeUsDream/DBNameFinder/main/database_name_finder_code.ps1"
@@ -42,12 +42,16 @@ if (-not $env:DBF_UPDATED) {
                 Write-Host "Güncelleme tamamlandı. Program yeniden başlatılıyor..." -ForegroundColor Green
                 Start-Sleep 2
 
+				Clear-Host
+
                 powershell -ExecutionPolicy Bypass -File $ScriptPath
                 exit
             }
             catch {
                 Write-Host "Güncelleme başarısız oldu." -ForegroundColor Red
                 Start-Sleep 3
+				
+				Clear-Host
             }
         }
         else {
@@ -220,4 +224,3 @@ Write-Host "--------------------------------------------------"
 Write-Host ""
 Write-Host ""
 Write-Host "Çıkış yapmak için herhangi bir tuşa basabilirsin..."
-
