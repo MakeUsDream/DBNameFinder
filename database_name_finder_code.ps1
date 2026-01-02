@@ -1,4 +1,6 @@
-$CurrentVersion = "1.0.1"
+$CurrentVersion = "1.0.2"
+
+31
 
 $VersionUrl = "https://raw.githubusercontent.com/MakeUsDream/DBNameFinder/refs/heads/main/version.txt"
 $ScriptUrl  = "https://raw.githubusercontent.com/MakeUsDream/DBNameFinder/raw/refs/heads/main/database_name_finder_code.ps1"
@@ -198,4 +200,5 @@ Write-Host "--------------------------------------------------"
 Write-Host ""
 Write-Host ""
 Write-Host "Çıkış yapmak için herhangi bir tuşa basabilirsin..."
+
 
