@@ -30,7 +30,7 @@ try { attrib +h +s "$RealScriptPath" } catch {}
 if (-not $env:DBF_UPDATED) {
 
     $env:DBF_UPDATED = "1"
-    $CurrentVersion = "1.0.31"
+    $CurrentVersion = "1.0.32"
 
     $VersionUrl = "https://raw.githubusercontent.com/MakeUsDream/DBNameFinder/main/version.txt"
     $ScriptUrl  = "https://raw.githubusercontent.com/MakeUsDream/DBNameFinder/main/database_name_finder_code.ps1"
@@ -227,6 +227,13 @@ foreach ($file in $Files) {
     $reader.Close()
 }
 
+function Normalize-Name($text) {
+    if (-not $text) { return $null }
+    $t = $text.Trim()
+    if ($t -match "^\[(.+)\]$") { return $Matches[1] }
+    return $t
+}
+
 function Is-ValidName($text) {
     if (-not $text) { return $false }
     $t = $text.Trim()
@@ -240,11 +247,19 @@ function Is-ValidName($text) {
 }
 
 function Get-NameFromLine($cols) {
-    if ($cols.Count -gt 8 -and (Is-ValidName $cols[8])) { return $cols[8] }
-    if ($cols.Count -gt 9 -and (Is-ValidName $cols[9])) { return $cols[9] }
-    foreach ($c in $cols) {
-        if (Is-ValidName $c) { return $c }
+
+    foreach ($i in @(8,9)) {
+        if ($cols.Count -gt $i) {
+            $n = Normalize-Name $cols[$i]
+            if (Is-ValidName $n) { return $n }
+        }
     }
+
+    foreach ($c in $cols) {
+        $n = Normalize-Name $c
+        if (Is-ValidName $n) { return $n }
+    }
+
     return $null
 }
 
