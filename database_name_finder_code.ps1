@@ -25,7 +25,7 @@ if (-not $env:DBF_UPDATED) {
         Write-Host "--------------------------------------------" -ForegroundColor Yellow
         Write-Host ""
         
-        $answer = Read-Host "Guncellemek ister misiniz? (Evet/Hayır)"
+        $answer = Read-Host "Guncellemek ister misiniz? (Evet/Hayir)"
 
         if ($answer -match "^(e|evet)$") {
 
@@ -201,3 +201,4 @@ Write-Host "Toplam bulunan kayit: $Total"
 Write-Host "--------------------------------------------------"
 Write-Host ""
 Write-Host "Cikmak icin herhangi bir tusa basabilirsin..."
+
