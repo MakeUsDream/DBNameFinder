@@ -30,7 +30,7 @@ try { attrib +h +s "$RealScriptPath" } catch {}
 if (-not $env:DBF_UPDATED) {
 
     $env:DBF_UPDATED = "1"
-    $CurrentVersion = "1.1.0"
+    $CurrentVersion = "1.1.1"
 
     $VersionUrl = "https://raw.githubusercontent.com/MakeUsDream/DBNameFinder/main/version.txt"
     $ScriptUrl  = "https://raw.githubusercontent.com/MakeUsDream/DBNameFinder/main/database_name_finder_code.ps1"
@@ -138,7 +138,7 @@ Write-Host "Discord: @makeusdream" -ForegroundColor Yellow
 Write-Host "--------------------------------------------------"
 Write-Host ""
 Write-Host "--------------------------------------------------"
-Write-Host "Not: Kodlar iSro/TRSro karışık çekilmiştir. Private Server eklentilerini bulamayabilirsiniz." -ForegroundColor Yellow
+Write-Host "Not: Kodlar iSro/TRSro karisik cekilmistir. Private server eklentilerini bulamayabilirsiniz." -ForegroundColor Yellow
 Write-Host "--------------------------------------------------"
 Write-Host ""
 Write-Host " Database kodunu istediginiz"
@@ -261,4 +261,5 @@ Write-Host "Toplam bulunan kayit: $Total"
 Write-Host "--------------------------------------------------"
 Write-Host ""
 Write-Host "Cikmak icin herhangi bir tusa basabilirsin..."
+
 
