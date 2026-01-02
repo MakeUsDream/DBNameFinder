@@ -1,7 +1,7 @@
 if (-not $env:DBF_UPDATED) {
 
     $env:DBF_UPDATED = "1"
-    $CurrentVersion = "1.0.6"
+    $CurrentVersion = "1.0.7"
 
     $VersionUrl = "https://raw.githubusercontent.com/MakeUsDream/DBNameFinder/main/version.txt"
     $ScriptUrl  = "https://raw.githubusercontent.com/MakeUsDream/DBNameFinder/main/database_name_finder_code.ps1"
@@ -20,11 +20,12 @@ if (-not $env:DBF_UPDATED) {
 
         Write-Host ""
         Write-Host "--------------------------------------------" -ForegroundColor Yellow
-        Write-Host "Yeni sürüm bulundu! ($LatestVersion)" -ForegroundColor Green
-        Write-Host "Mevcut sürüm: $CurrentVersion"
+        Write-Host "Yeni surum bulundu! ($LatestVersion)" -ForegroundColor Green
+        Write-Host "Mevcut surum: $CurrentVersion"
         Write-Host "--------------------------------------------" -ForegroundColor Yellow
-
-        $answer = Read-Host "Güncellemek ister misiniz? (Evet/Hayır)"
+        Write-Host ""
+        
+        $answer = Read-Host "Guncellemek ister misiniz? (Evet/Hayır)"
 
         if ($answer -match "^(e|evet)$") {
 
@@ -35,14 +36,15 @@ if (-not $env:DBF_UPDATED) {
                 Remove-Item Env:\DBF_UPDATED -ErrorAction SilentlyContinue
 
                 Write-Host ""
-                Write-Host "Güncelleme tamamlandı. Program yeniden başlatılıyor..." -ForegroundColor Green
+                Write-Host "Guncelleme tamamlandi. Program yeniden baslatiliyor..." -ForegroundColor Green
+                Write-Host ""
                 Start-Sleep 2
 
                 powershell -ExecutionPolicy Bypass -File $ScriptPath
                 exit
             }
             catch {
-                Write-Host "Güncelleme başarısız oldu." -ForegroundColor Red
+                Write-Host "Guncelleme basarisiz oldu." -ForegroundColor Red
                 Start-Sleep 3
             }
         }
@@ -85,23 +87,23 @@ foreach ($f in $Files) {
 
 Clear-Host
 Write-Host "--------------------------------------------------"
-Write-Host "Silkroad database kodlarını almayı kolaylaştırmak" -ForegroundColor Yellow
-Write-Host "için tasarlanmış bir uygulamadır." -ForegroundColor Yellow
+Write-Host "Silkroad  database kodlarini almayi kolaylastirmak icin tasarlanmis bir uygulamadir." -ForegroundColor Yellow
 Write-Host "Created by Echidna" -ForegroundColor Yellow
 Write-Host "Discord: @makeusdream" -ForegroundColor Yellow
 Write-Host "--------------------------------------------------"
 Write-Host ""
-Write-Host "Not: Bazı database kodları çıkmayabilir." -ForegroundColor Yellow
-Write-Host "Gerekirse textdata_ dosyalarını güncelleyin." -ForegroundColor Yellow
+Write-Host "--------------------------------------------------"
+Write-Host "Not: Bazi database kodlari cikmayabilir. Eger cikmazsa [Database] icinde ki textdata_ dosyalarini guncelleyiniz." -ForegroundColor Yellow
 Write-Host "--------------------------------------------------"
 Write-Host ""
-Write-Host "Mob - İtem - Pet - Zone - NPC - Skill - Yapı"
-$Search = Read-Host "Aramak istediğiniz ismi giriniz"
+Write-Host "  Database kodunu istediginiz"
+Write-Host "  Mob - Item - Pet - Zone - Npc - Skill - Structure"
+$Search = Read-Host "  ismini giriniz. (ornek: capricorn gia brain) "
 
 Clear-Host
 Write-Host ""
 Write-Host "--------------------------------------------------"
-Write-Host "Database kodu aranıyor, lütfen bekleyin..." -ForegroundColor Blue
+Write-Host "Database kodu araniyor, lutfen biraz bekle..." -ForegroundColor Blue
 Write-Host "--------------------------------------------------"
 
 $MobList       = @()
@@ -176,13 +178,13 @@ function PrintGroup($title, $list) {
     }
 }
 
-PrintGroup "Mob İsimleri"        $MobList
-PrintGroup "İtem İsimleri"       $ItemList
-PrintGroup "Pet / COS İsimleri"  $CosList
-PrintGroup "Zone İsimleri"       $ZoneList
-PrintGroup "NPC İsimleri"        $NpcList
-PrintGroup "Skill İsimleri"      $SkillList
-PrintGroup "Yapı İsimleri"       $StructureList
+PrintGroup "Mob Isimleri"        $MobList
+PrintGroup "Item Isimleri"       $ItemList
+PrintGroup "Pet / COS Isimleri"  $CosList
+PrintGroup "Zone Isimleri"       $ZoneList
+PrintGroup "NPC Isimleri"        $NpcList
+PrintGroup "Skill Isimleri"      $SkillList
+PrintGroup "Structure Isimleri"       $StructureList
 
 $Total =
     $MobList.Count +
@@ -195,8 +197,9 @@ $Total =
 
 Write-Host ""
 Write-Host "--------------------------------------------------"
-Write-Host "Toplam bulunan kayıt: $Total"
+Write-Host "Toplam bulunan kayit: $Total"
 Write-Host "--------------------------------------------------"
 Write-Host ""
-Write-Host "Çıkmak için herhangi bir tuşa basabilirsiniz..."
+Write-Host "Cikmak icin herhangi bir tusa basabilirsin..."
+
 
