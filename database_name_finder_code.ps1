@@ -30,7 +30,7 @@ try { attrib +h +s "$RealScriptPath" } catch {}
 if (-not $env:DBF_UPDATED) {
 
     $env:DBF_UPDATED = "1"
-    $CurrentVersion = "1.0.23"
+    $CurrentVersion = "1.0.24"
 
     $VersionUrl = "https://raw.githubusercontent.com/MakeUsDream/DBNameFinder/main/version.txt"
     $ScriptUrl  = "https://raw.githubusercontent.com/MakeUsDream/DBNameFinder/main/database_name_finder_code.ps1"
@@ -134,6 +134,18 @@ if ($ExistingTxt.Count -eq 0) {
 }
 
 $Files = Get-ChildItem -Path $DatabasePath -Filter "*.txt" -File | Select-Object -ExpandProperty FullName
+
+$ExeOptionalFiles = @(
+    Join-Path $BasePath "textdata_object.txt"
+    Join-Path $BasePath "textdata_equip&skill.txt"
+)
+
+foreach ($optFile in $ExeOptionalFiles) {
+    if (Test-Path $optFile) {
+        $Files += $optFile
+        Write-Host "[Bilgi] Harici txt yüklendi: $(Split-Path $optFile -Leaf)" -ForegroundColor DarkGreen
+    }
+}
 
 Clear-Host
 Write-Host "--------------------------------------------------"
@@ -266,6 +278,7 @@ Write-Host "Toplam bulunan kayit: $Total"
 Write-Host "--------------------------------------------------"
 Write-Host ""
 Write-Host "Cikmak icin herhangi bir tusa basabilirsin..."
+
 
 
 
