@@ -55,8 +55,6 @@ if (-not $env:DBF_UPDATED) {
     }
 }
 
-Clear-Host
-
 $BasePath =
 if ($PSScriptRoot) {
     $PSScriptRoot
@@ -217,7 +215,3 @@ Write-Host "--------------------------------------------------"
 Write-Host ""
 Write-Host ""
 Write-Host "Çıkış yapmak için herhangi bir tuşa basabilirsin..."
-
-
-
-
