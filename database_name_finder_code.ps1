@@ -1,41 +1,56 @@
-$CurrentVersion = "1.0.2"
+[Console]::InputEncoding  = [System.Text.Encoding]::GetEncoding(857)
+[Console]::OutputEncoding = [System.Text.Encoding]::GetEncoding(857)
+chcp 857 | Out-Null
 
-31
+if (-not $env:DBF_UPDATED) {
 
-$VersionUrl = "https://raw.githubusercontent.com/MakeUsDream/DBNameFinder/refs/heads/main/version.txt"
-$ScriptUrl  = "https://raw.githubusercontent.com/MakeUsDream/DBNameFinder/raw/refs/heads/main/database_name_finder_code.ps1"
+    $env:DBF_UPDATED = "1"
+    $CurrentVersion = "1.0.0"
 
-try {
-    $LatestVersion = (Invoke-WebRequest $VersionUrl -UseBasicParsing).Content.Trim()
-}
-catch {
-    $LatestVersion = $CurrentVersion
-}
+    $VersionUrl = "https://raw.githubusercontent.com/MakeUsDream/DBNameFinder/main/version.txt"
+    $ScriptUrl  = "https://raw.githubusercontent.com/MakeUsDream/DBNameFinder/main/database_name_finder_code.ps1"
 
-if ($LatestVersion -ne $CurrentVersion) {
+    $ScriptPath = $PSCommandPath
+    $TempPath   = "$ScriptPath.new"
 
-    Write-Host ""
-    Write-Host "--------------------------------------------" -ForegroundColor Yellow
-    Write-Host "Yeni sürüm bulundu! ($LatestVersion)" -ForegroundColor Green
-    Write-Host "Mevcut sürüm: $CurrentVersion"
-    Write-Host "--------------------------------------------" -ForegroundColor Yellow
+    try {
+        $LatestVersion = (Invoke-WebRequest $VersionUrl -UseBasicParsing).Content.Trim()
+    }
+    catch {
+        $LatestVersion = $CurrentVersion
+    }
 
-    $answer = Read-Host "Güncellemek ister misiniz? (E/H)"
+    if ($LatestVersion -ne $CurrentVersion) {
 
-    if ($answer -match "^[eE]$") {
+        Write-Host ""
+        Write-Host "--------------------------------------------" -ForegroundColor Yellow
+        Write-Host "Yeni sürüm bulundu! ($LatestVersion)" -ForegroundColor Green
+        Write-Host "Mevcut sürüm: $CurrentVersion"
+        Write-Host "--------------------------------------------" -ForegroundColor Yellow
 
-        try {
-            $newScript = Invoke-WebRequest $ScriptUrl -UseBasicParsing
-            $newScript.Content | Set-Content $MyInvocation.MyCommand.Path -Encoding UTF8
+        $answer = Read-Host "Güncellemek ister misiniz? (E/H)"
 
-            Write-Host "Güncelleme tamamlandı. Program yeniden başlatılıyor..."
-            Start-Sleep 2
+        if ($answer -match "^[eE]$") {
 
-            powershell -ExecutionPolicy Bypass -File $MyInvocation.MyCommand.Path
-            exit
+            try {
+                Invoke-WebRequest $ScriptUrl -UseBasicParsing -OutFile $TempPath
+                Move-Item -Path $TempPath -Destination $ScriptPath -Force
+
+                Write-Host ""
+                Write-Host "Güncelleme tamamlandı. Program yeniden başlatılıyor..." -ForegroundColor Green
+                Start-Sleep 2
+
+                powershell -ExecutionPolicy Bypass -File $ScriptPath
+                exit
+            }
+            catch {
+                Write-Host "Güncelleme başarısız oldu." -ForegroundColor Red
+                Start-Sleep 3
+            }
         }
-        catch {
-            Write-Host "Güncelleme başarısız oldu."
+        else {
+            Write-Host "Güncelleme ertelendi." -ForegroundColor Cyan
+            Start-Sleep 2
         }
     }
 }
@@ -200,5 +215,6 @@ Write-Host "--------------------------------------------------"
 Write-Host ""
 Write-Host ""
 Write-Host "Çıkış yapmak için herhangi bir tuşa basabilirsin..."
+
 
 
