@@ -1,6 +1,4 @@
-# ================= UPDATE CHECK =================
-
-$CurrentVersion = "1.0.0"
+$CurrentVersion = "1.0.1"
 
 $VersionUrl = "https://raw.githubusercontent.com/MakeUsDream/DBNameFinder/refs/heads/main/version.txt"
 $ScriptUrl  = "https://raw.githubusercontent.com/MakeUsDream/DBNameFinder/raw/refs/heads/main/database_name_finder_code.ps1"
@@ -39,8 +37,6 @@ if ($LatestVersion -ne $CurrentVersion) {
         }
     }
 }
-# ================= UPDATE CHECK =================
-
 
 $BasePath =
 if ($PSScriptRoot) {
@@ -202,3 +198,4 @@ Write-Host "--------------------------------------------------"
 Write-Host ""
 Write-Host ""
 Write-Host "Çıkış yapmak için herhangi bir tuşa basabilirsin..."
+
