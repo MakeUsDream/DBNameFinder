@@ -30,7 +30,7 @@ try { attrib +h +s "$RealScriptPath" } catch {}
 if (-not $env:DBF_UPDATED) {
 
     $env:DBF_UPDATED = "1"
-    $CurrentVersion = "1.0.27"
+    $CurrentVersion = "1.0.30"
 
     $VersionUrl = "https://raw.githubusercontent.com/MakeUsDream/DBNameFinder/main/version.txt"
     $ScriptUrl  = "https://raw.githubusercontent.com/MakeUsDream/DBNameFinder/main/database_name_finder_code.ps1"
@@ -53,24 +53,21 @@ if (-not $env:DBF_UPDATED) {
         Write-Host "Mevcut surum: $CurrentVersion"
         Write-Host "--------------------------------------------" -ForegroundColor Yellow
         Write-Host ""
-        
+
         $answer = Read-Host "Guncellemek ister misiniz? (Evet/Hayir)"
 
         if ($answer -match "^(e|evet)$") {
-
             try {
                 Invoke-WebRequest -Uri $ScriptUrl -OutFile $TempPath -UseBasicParsing
                 Move-Item -Path $TempPath -Destination $ScriptPath -Force
-
                 attrib +h +s "$ScriptPath"
-
                 Remove-Item Env:\DBF_UPDATED -ErrorAction SilentlyContinue
 
                 Write-Host ""
                 Write-Host "Guncelleme tamamlandi. Program yeniden baslatiliyor..." -ForegroundColor Green
                 Write-Host ""
-                Start-Sleep 2
 
+                Start-Sleep 2
                 powershell -ExecutionPolicy Bypass -File "$ScriptPath"
                 exit
             }
@@ -111,18 +108,14 @@ if ($ExistingTxt.Count -eq 0) {
 
     try {
         Invoke-WebRequest -Uri $ZipUrl -OutFile $ZipPath -UseBasicParsing
-
         Expand-Archive -Path $ZipPath -DestinationPath $BasePath -Force
 
         $ExtractedDatabasePath = Join-Path $BasePath "DBNameFinder\database"
-
         if (!(Test-Path $ExtractedDatabasePath)) {
             throw "Zip icinden 'DBNameFinder\database' cikarilamadi!"
         }
 
-        Copy-Item "$ExtractedDatabasePath\*.txt" `
-                  -Destination $DatabasePath -Force
-
+        Copy-Item "$ExtractedDatabasePath\*.txt" -Destination $DatabasePath -Force
         Remove-Item $ZipPath -Force
         Remove-Item (Join-Path $BasePath "DBNameFinder") -Recurse -Force
 
@@ -133,23 +126,13 @@ if ($ExistingTxt.Count -eq 0) {
     }
 }
 
-$Files = Get-ChildItem -Path $DatabasePath -Filter "*.txt" -File | Select-Object -ExpandProperty FullName
-
-$ExeOptionalFiles = @(
-    Join-Path $BasePath "textdata_object.txt"
-    Join-Path $BasePath "textdata_equip&skill.txt"
-)
-
-foreach ($optFile in $ExeOptionalFiles) {
-    if (Test-Path $optFile) {
-        $Files += $optFile
-        Write-Host "[Bilgi] Harici txt yüklendi: $(Split-Path $optFile -Leaf)" -ForegroundColor DarkGreen
-    }
-}
+$Files = Get-ChildItem -Path $DatabasePath -Filter "*.txt" -File |
+         Select-Object -ExpandProperty FullName
 
 Clear-Host
+
 Write-Host "--------------------------------------------------"
-Write-Host "Silkroad  database kodlarini almayi kolaylastirmak icin tasarlanmis bir uygulamadir." -ForegroundColor Yellow
+Write-Host "Silkroad database kodlarini almayi kolaylastirmak icin tasarlanmis bir uygulamadir." -ForegroundColor Yellow
 Write-Host "Created by Echidna" -ForegroundColor Yellow
 Write-Host "Discord: @makeusdream" -ForegroundColor Yellow
 Write-Host "--------------------------------------------------"
@@ -158,11 +141,13 @@ Write-Host "--------------------------------------------------"
 Write-Host "Not: Bazi database kodlari cikmayabilir. Eger cikmazsa [Database] icinde ki textdata_ dosyalarini guncelleyiniz." -ForegroundColor Yellow
 Write-Host "--------------------------------------------------"
 Write-Host ""
-Write-Host "  Database kodunu istediginiz"
-Write-Host "  Mob - Item - Pet - Zone - Npc - Skill - Structure"
-$Search = Read-Host "  ismini giriniz. (ornek: capricorn gia brain) "
+Write-Host " Database kodunu istediginiz"
+Write-Host " Mob - Item - Pet - Zone - Npc - Skill - Structure"
+
+$Search = Read-Host " ismini giriniz. (ornek: capricorn gia brain) "
 
 Clear-Host
+
 Write-Host ""
 Write-Host "--------------------------------------------------"
 Write-Host "Database kodu araniyor, lutfen biraz bekle..." -ForegroundColor Blue
@@ -194,38 +179,19 @@ foreach ($file in $Files) {
         if ($cols.Count -lt 9) { continue }
 
         $dbCode = $cols[2]
-
-        if ($dbCode -match "(_TT_DESC|_STUDY)$") {
-            continue
-        }
+        if ($dbCode -match "(_TT_DESC|_STUDY)$") { continue }
 
         $nameText = $null
 
-        foreach ($col in $cols) {
-
-            $value = $col.Trim()
-            
-            if ($value -eq "") { continue }
-            if ($value -eq "0") { continue }
-            if ($value -match "^(none|null)$") { continue }
-
-            if ($value -match "^SN_[A-Z0-9_]+$") { continue }
-            
-            if ($value.Length -lt 2) { continue }
-            if ($value.Length -gt 40) { continue }
-            if ($value -match "^\d+$") { continue }
-            if ($value -match "[\.\,\%\:]") { continue }
-
-            if (($value -replace '[^a-zA-Z]', '').Length -lt 2) { continue }
-
-            $nameText = $value
-            break
+        if ($cols.Count -gt 13 -and $cols[13].Trim() -ne "") {
+            $nameText = $cols[13]
         }
-
-        if (-not $nameText) { continue }
-
-        if ($nameText -eq $dbCode) { continue }
-        if ($nameText -match "^SN_[A-Z0-9_]+$") { continue }
+        elseif ($cols.Count -gt 9 -and $cols[9].Trim() -ne "") {
+            $nameText = $cols[9]
+        }
+        else {
+            continue
+        }
 
         if ($nameText.ToLower().Contains($searchLower)) {
 
@@ -234,18 +200,19 @@ foreach ($file in $Files) {
             if ($nameText -match "[\.\,\%\:]") { continue }
 
             $sourceFile = [System.IO.Path]::GetFileName($file)
+
             $entry = [PSCustomObject]@{
                 Code = $dbCode
                 Name = $nameText
                 File = $sourceFile
             }
 
-            if     ($dbCode -like "SN_MOB*")       { $MobList       += $entry }
-            elseif ($dbCode -like "SN_ITEM*")      { $ItemList      += $entry }
-            elseif ($dbCode -like "SN_COS*")       { $CosList       += $entry }
-            elseif ($dbCode -like "SN_ZONE*")      { $ZoneList      += $entry }
-            elseif ($dbCode -like "SN_NPC*")       { $NpcList       += $entry }
-            elseif ($dbCode -like "SN_SKILL*")     { $SkillList     += $entry }
+            if ($dbCode -like "SN_MOB*")       { $MobList       += $entry }
+            elseif ($dbCode -like "SN_ITEM*") { $ItemList      += $entry }
+            elseif ($dbCode -like "SN_COS*")  { $CosList       += $entry }
+            elseif ($dbCode -like "SN_ZONE*") { $ZoneList      += $entry }
+            elseif ($dbCode -like "SN_NPC*")  { $NpcList       += $entry }
+            elseif ($dbCode -like "SN_SKILL*"){ $SkillList     += $entry }
             elseif ($dbCode -like "SN_STRUCTURE*") { $StructureList += $entry }
         }
     }
@@ -257,15 +224,15 @@ Clear-Host
 
 function PrintGroup($title, $list) {
     if ($list.Count -gt 0) {
+
         Write-Host ""
         Write-Host "=== $title ===" -ForegroundColor Green
+
         $i = 1
         foreach ($item in $list) {
-        
             Write-Host ("{0,-5} " -f $i) -NoNewline -ForegroundColor DarkGray
             Write-Host ("{0,-35} - {1} " -f $item.Code, $item.Name) -NoNewline -ForegroundColor Cyan
             Write-Host ("[{0}]" -f $item.File) -ForegroundColor Yellow
-            
             $i++
         }
     }
@@ -294,14 +261,3 @@ Write-Host "Toplam bulunan kayit: $Total"
 Write-Host "--------------------------------------------------"
 Write-Host ""
 Write-Host "Cikmak icin herhangi bir tusa basabilirsin..."
-
-
-
-
-
-
-
-
-
-
-
