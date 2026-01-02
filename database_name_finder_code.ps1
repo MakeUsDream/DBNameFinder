@@ -13,7 +13,7 @@ try { attrib +h +s "$RealScriptPath" } catch {}
 if (-not $env:DBF_UPDATED) {
 
     $env:DBF_UPDATED = "1"
-    $CurrentVersion = "1.0.16"
+    $CurrentVersion = "1.0.17"
 
     $VersionUrl = "https://raw.githubusercontent.com/MakeUsDream/DBNameFinder/main/version.txt"
     $ScriptUrl  = "https://raw.githubusercontent.com/MakeUsDream/DBNameFinder/main/database_name_finder_code.ps1"
@@ -45,7 +45,6 @@ if (-not $env:DBF_UPDATED) {
                 Invoke-WebRequest -Uri $ScriptUrl -OutFile $TempPath -UseBasicParsing
                 Move-Item -Path $TempPath -Destination $ScriptPath -Force
 
-                # Update sonrasi tekrar gizle (KESIN)
                 attrib +h +s "$ScriptPath"
 
                 Remove-Item Env:\DBF_UPDATED -ErrorAction SilentlyContinue
@@ -83,19 +82,40 @@ if (!(Test-Path $DatabasePath)) {
     Write-Host "[Bilgi] 'database' klasoru bulunamadi, otomatik olarak olusturuldu." -ForegroundColor Yellow
 }
 
-$Files = @(
-    (Join-Path $DatabasePath "textdata_object.txt"),
-    (Join-Path $DatabasePath "textdata_equip&skill.txt")
-)
+$ExistingTxt = Get-ChildItem -Path $DatabasePath -Filter "*.txt" -ErrorAction SilentlyContinue
 
-foreach ($f in $Files) {
-    if (!(Test-Path $f)) {
-        Write-Host "Maalesef, dosya bulunamadi: $f" -ForegroundColor Red
-        Write-Host "Cikmak icin herhangi bir tusa basabilirsin..."
-        $null = $Host.UI.RawUI.ReadKey("NoEcho,IncludeKeyDown")
-        exit 1
+if ($ExistingTxt.Count -eq 0) {
+
+    Write-Host ""
+    Write-Host "[Bilgi] 'database' klasoru bos. Kodlar indiriliyor..." -ForegroundColor Yellow
+
+    $ZipUrl  = "https://raw.githubusercontent.com/MakeUsDream/DBNameFinder/main/database.zip"
+    $ZipPath = Join-Path $BasePath "database.zip"
+
+    try {
+        Invoke-WebRequest -Uri $ZipUrl -OutFile $ZipPath -UseBasicParsing
+
+        Expand-Archive -Path $ZipPath -DestinationPath $BasePath -Force
+
+        $ZipDatabasePath = Join-Path $BasePath "database"
+
+        if (!(Test-Path $ZipDatabasePath)) {
+            throw "Zip icinden 'database' klasoru cikmadi!"
+        }
+
+        Copy-Item "$ZipDatabasePath\*.txt" `
+                  -Destination $DatabasePath -Force
+
+        Remove-Item $ZipPath -Force
+
+        Write-Host "[OK] Database txt dosyalari geri yuklendi." -ForegroundColor Green
+    }
+    catch {
+        Write-Host "[HATA] Database geri yuklenemedi!" -ForegroundColor Red
     }
 }
+
+$Files = Get-ChildItem -Path $DatabasePath -Filter "*.txt" -File | Select-Object -ExpandProperty FullName
 
 Clear-Host
 Write-Host "--------------------------------------------------"
@@ -132,7 +152,7 @@ foreach ($file in $Files) {
 
     $reader = [System.IO.StreamReader]::new(
         $file,
-        [System.Text.Encoding]::GetEncoding(857) # Silkroad dosyaları
+        [System.Text.Encoding]::GetEncoding(857)
     )
 
     while (-not $reader.EndOfStream) {
@@ -143,30 +163,31 @@ foreach ($file in $Files) {
         $cols = $line -split "`t"
         if ($cols.Count -lt 9) { continue }
 
-        $dbCode = $cols[1]
+        $dbCode = $cols[2]
 
         if ($dbCode -match "(_TT_DESC|_STUDY)$") {
             continue
         }
-        
-        $lastText = $null
 
-        for ($i = $cols.Count - 1; $i -ge 0; $i--) {
-            if ($cols[$i].Trim() -ne "") {
-                $lastText = $cols[$i]
-                break
-            }
+        $nameText = $null
+
+        if ($cols.Count -gt 13 -and $cols[13].Trim() -ne "") {
+            $nameText = $cols[13]
+        }
+        elseif ($cols.Count -gt 9 -and $cols[9].Trim() -ne "") {
+            $nameText = $cols[9]
+        }
+        else {
+            continue
         }
 
-        if (-not $lastText) { continue }
+        if ($nameText.ToLower().Contains($searchLower)) {
 
-        if ($lastText.ToLower().Contains($searchLower)) {
+            if ($nameText.Length -gt 40) { continue }
+            if (($nameText -split ' ').Count -gt 6) { continue }
+            if ($nameText -match "[\.\,\%\:]") { continue }
 
-            if ($lastText.Length -gt 40) { continue }
-            if (($lastText -split ' ').Count -gt 6) { continue }
-            if ($lastText -match "[\.\,\%\:]") { continue }
-
-            $entry = "{0,-35} - {1}" -f $dbCode, $lastText
+            $entry = "{0,-35} - {1}" -f $dbCode, $nameText
 
             if     ($dbCode -like "SN_MOB*")       { $MobList       += $entry }
             elseif ($dbCode -like "SN_ITEM*")      { $ItemList      += $entry }
@@ -201,7 +222,7 @@ PrintGroup "Pet / COS Isimleri"  $CosList
 PrintGroup "Zone Isimleri"       $ZoneList
 PrintGroup "NPC Isimleri"        $NpcList
 PrintGroup "Skill Isimleri"      $SkillList
-PrintGroup "Structure Isimleri"       $StructureList
+PrintGroup "Structure Isimleri"  $StructureList
 
 $Total =
     $MobList.Count +
@@ -218,11 +239,3 @@ Write-Host "Toplam bulunan kayit: $Total"
 Write-Host "--------------------------------------------------"
 Write-Host ""
 Write-Host "Cikmak icin herhangi bir tusa basabilirsin..."
-
-
-
-
-
-
-
-
