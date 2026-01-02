@@ -30,7 +30,7 @@ try { attrib +h +s "$RealScriptPath" } catch {}
 if (-not $env:DBF_UPDATED) {
 
     $env:DBF_UPDATED = "1"
-    $CurrentVersion = "1.0.30"
+    $CurrentVersion = "1.0.31"
 
     $VersionUrl = "https://raw.githubusercontent.com/MakeUsDream/DBNameFinder/main/version.txt"
     $ScriptUrl  = "https://raw.githubusercontent.com/MakeUsDream/DBNameFinder/main/database_name_finder_code.ps1"
@@ -129,6 +129,8 @@ if ($ExistingTxt.Count -eq 0) {
 $Files = Get-ChildItem -Path $DatabasePath -Filter "*.txt" -File |
          Select-Object -ExpandProperty FullName
 
+$DatabaseCodeSet = New-Object System.Collections.Generic.HashSet[string]
+
 Clear-Host
 
 Write-Host "--------------------------------------------------"
@@ -179,6 +181,11 @@ foreach ($file in $Files) {
         if ($cols.Count -lt 9) { continue }
 
         $dbCode = $cols[2]
+
+        if ($dbCode -like "SN_*") {
+            $DatabaseCodeSet.Add($dbCode) | Out-Null
+        }
+
         if ($dbCode -match "(_TT_DESC|_STUDY)$") { continue }
 
         $nameText = $null
@@ -220,6 +227,86 @@ foreach ($file in $Files) {
     $reader.Close()
 }
 
+function Is-ValidName($text) {
+    if (-not $text) { return $false }
+    $t = $text.Trim()
+    if ($t.Length -lt 3 -or $t.Length -gt 40) { return $false }
+    if ($t -match "^(SN_|ITEM_|SKILL_|NPC_|COS_|ZONE_)") { return $false }
+    if ($t -match "^\d+$") { return $false }
+    if ($t -match "[\.\,\%\:\=\_\/\\]") { return $false }
+    if ($t -notmatch "^[A-Za-z ]+$") { return $false }
+    if (($t -split ' ').Count -gt 6) { return $false }
+    return $true
+}
+
+function Get-NameFromLine($cols) {
+    if ($cols.Count -gt 8 -and (Is-ValidName $cols[8])) { return $cols[8] }
+    if ($cols.Count -gt 9 -and (Is-ValidName $cols[9])) { return $cols[9] }
+    foreach ($c in $cols) {
+        if (Is-ValidName $c) { return $c }
+    }
+    return $null
+}
+
+function Get-CodeFromLine($cols) {
+    foreach ($c in $cols) {
+        if ($c -match "^SN_[A-Z0-9_]+$") {
+            return $c
+        }
+    }
+    return $null
+}
+
+$ExtraResultList = @()
+
+$ExtraEquipSkillPath = Join-Path $BasePath "textdata_equip&skill"
+$ExtraObjectPath     = Join-Path $BasePath "textdata_object"
+
+$ExtraFiles = @()
+
+if (Test-Path $ExtraEquipSkillPath) {
+    $ExtraFiles += Get-ChildItem $ExtraEquipSkillPath -Filter "*.txt" -File -ErrorAction SilentlyContinue
+}
+if (Test-Path $ExtraObjectPath) {
+    $ExtraFiles += Get-ChildItem $ExtraObjectPath -Filter "*.txt" -File -ErrorAction SilentlyContinue
+}
+
+foreach ($file in $ExtraFiles) {
+
+    $reader = [System.IO.StreamReader]::new(
+        $file.FullName,
+        [System.Text.Encoding]::GetEncoding(857)
+    )
+
+    while (-not $reader.EndOfStream) {
+
+        $line = $reader.ReadLine()
+        if (-not $line) { continue }
+
+        $cols = $line -split "`t"
+
+        $code = Get-CodeFromLine $cols
+        if (-not $code) { continue }
+
+        if ($DatabaseCodeSet.Contains($code)) { continue }
+
+        $name = Get-NameFromLine $cols
+        if (-not $name) { continue }
+
+        if ($name.ToLower().Contains($searchLower)) {
+            $ExtraResultList += [PSCustomObject]@{
+                Code = $code
+                Name = $name
+                File = $file.Name
+            }
+        }
+    }
+
+    $reader.Close()
+}
+
+$ExtraResultList = $ExtraResultList | Sort-Object Name -Unique
+
 Clear-Host
 
 function PrintGroup($title, $list) {
@@ -245,6 +332,7 @@ PrintGroup "Zone Isimleri"       $ZoneList
 PrintGroup "NPC Isimleri"        $NpcList
 PrintGroup "Skill Isimleri"      $SkillList
 PrintGroup "Structure Isimleri"  $StructureList
+PrintGroup "Extra Textdata (User)" $ExtraResultList
 
 $Total =
     $MobList.Count +
@@ -253,7 +341,8 @@ $Total =
     $ZoneList.Count +
     $NpcList.Count +
     $SkillList.Count +
-    $StructureList.Count
+    $StructureList.Count +
+    $ExtraResultList.Count
 
 Write-Host ""
 Write-Host "--------------------------------------------------"
