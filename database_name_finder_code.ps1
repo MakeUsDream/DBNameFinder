@@ -1,7 +1,7 @@
 if (-not $env:DBF_UPDATED) {
 
     $env:DBF_UPDATED = "1"
-    $CurrentVersion = "1.0.5"
+    $CurrentVersion = "1.0.6"
 
     $VersionUrl = "https://raw.githubusercontent.com/MakeUsDream/DBNameFinder/main/version.txt"
     $ScriptUrl  = "https://raw.githubusercontent.com/MakeUsDream/DBNameFinder/main/database_name_finder_code.ps1"
@@ -199,3 +199,4 @@ Write-Host "Toplam bulunan kayıt: $Total"
 Write-Host "--------------------------------------------------"
 Write-Host ""
 Write-Host "Çıkmak için herhangi bir tuşa basabilirsiniz..."
+
