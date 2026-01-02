@@ -1,7 +1,3 @@
-﻿[Console]::InputEncoding  = [System.Text.Encoding]::GetEncoding(857)
-[Console]::OutputEncoding = [System.Text.Encoding]::GetEncoding(857)
-chcp 857 | Out-Null
-
 if (-not $env:DBF_UPDATED) {
 
     $env:DBF_UPDATED = "1"
@@ -231,4 +227,5 @@ Write-Host "--------------------------------------------------"
 Write-Host ""
 Write-Host ""
 Write-Host "Çıkış yapmak için herhangi bir tuşa basabilirsin..."
+
 
