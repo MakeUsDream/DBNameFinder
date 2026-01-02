@@ -5,7 +5,7 @@ chcp 857 | Out-Null
 if (-not $env:DBF_UPDATED) {
 
     $env:DBF_UPDATED = "1"
-    $CurrentVersion = "1.0.3"
+    $CurrentVersion = "1.0.4"
 
     $VersionUrl = "https://raw.githubusercontent.com/MakeUsDream/DBNameFinder/main/version.txt"
     $ScriptUrl  = "https://raw.githubusercontent.com/MakeUsDream/DBNameFinder/main/database_name_finder_code.ps1"
@@ -54,6 +54,8 @@ if (-not $env:DBF_UPDATED) {
         }
     }
 }
+
+Clear-Host
 
 $BasePath =
 if ($PSScriptRoot) {
@@ -215,6 +217,7 @@ Write-Host "--------------------------------------------------"
 Write-Host ""
 Write-Host ""
 Write-Host "Çıkış yapmak için herhangi bir tuşa basabilirsin..."
+
 
 
 
