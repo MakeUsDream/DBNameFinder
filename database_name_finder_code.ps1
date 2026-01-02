@@ -30,7 +30,7 @@ try { attrib +h +s "$RealScriptPath" } catch {}
 if (-not $env:DBF_UPDATED) {
 
     $env:DBF_UPDATED = "1"
-    $CurrentVersion = "1.0.24"
+    $CurrentVersion = "1.0.25"
 
     $VersionUrl = "https://raw.githubusercontent.com/MakeUsDream/DBNameFinder/main/version.txt"
     $ScriptUrl  = "https://raw.githubusercontent.com/MakeUsDream/DBNameFinder/main/database_name_finder_code.ps1"
@@ -201,15 +201,25 @@ foreach ($file in $Files) {
 
         $nameText = $null
 
-        if ($cols.Count -gt 13 -and $cols[13].Trim() -ne "") {
-            $nameText = $cols[13]
+        foreach ($col in $cols) {
+
+            $value = $col.Trim()
+            
+            if ($value -eq "") { continue }
+            if ($value -eq "0") { continue }
+            if ($value -match "^(none|null)$") { continue }
+            if ($value.Length -lt 2) { continue }
+            if ($value.Length -gt 40) { continue }
+            if ($value -match "^\d+$") { continue }
+            if ($value -match "[\.\,\%\:]") { continue }
+
+            if (($value -replace '[^a-zA-Z]', '').Length -lt 2) { continue }
+
+            $nameText = $value
+            break
         }
-        elseif ($cols.Count -gt 9 -and $cols[9].Trim() -ne "") {
-            $nameText = $cols[9]
-        }
-        else {
-            continue
-        }
+
+        if (-not $nameText) { continue }
 
         if ($nameText.ToLower().Contains($searchLower)) {
 
@@ -278,6 +288,7 @@ Write-Host "Toplam bulunan kayit: $Total"
 Write-Host "--------------------------------------------------"
 Write-Host ""
 Write-Host "Cikmak icin herhangi bir tusa basabilirsin..."
+
 
 
 
