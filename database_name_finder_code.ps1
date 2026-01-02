@@ -138,7 +138,7 @@ Write-Host "Discord: @makeusdream" -ForegroundColor Yellow
 Write-Host "--------------------------------------------------"
 Write-Host ""
 Write-Host "--------------------------------------------------"
-Write-Host "Not: Bazi database kodlari cikmayabilir. Eger cikmazsa [Database] icinde ki textdata_ dosyalarini guncelleyiniz." -ForegroundColor Yellow
+Write-Host "Not: Kodlar iSro/TRSro karışık çekilmiştir. Private Server eklentilerini bulamayabilirsiniz." -ForegroundColor Yellow
 Write-Host "--------------------------------------------------"
 Write-Host ""
 Write-Host " Database kodunu istediginiz"
@@ -261,3 +261,4 @@ Write-Host "Toplam bulunan kayit: $Total"
 Write-Host "--------------------------------------------------"
 Write-Host ""
 Write-Host "Cikmak icin herhangi bir tusa basabilirsin..."
+
