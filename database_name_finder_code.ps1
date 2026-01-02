@@ -87,7 +87,7 @@ $ExistingTxt = Get-ChildItem -Path $DatabasePath -Filter "*.txt" -ErrorAction Si
 if ($ExistingTxt.Count -eq 0) {
 
     Write-Host ""
-    Write-Host "[Bilgi] 'database' klasoru bos. Kodlar indiriliyor..." -ForegroundColor Yellow
+    Write-Host "[Bilgi] 'database' klasoru bos. .txt dosyalari indiriliyor..." -ForegroundColor Yellow
 
     $ZipUrl  = "https://raw.githubusercontent.com/MakeUsDream/DBNameFinder/main/DBNameFinder.zip"
     $ZipPath = Join-Path $BasePath "DBNameFinder.zip"
@@ -100,7 +100,7 @@ if ($ExistingTxt.Count -eq 0) {
         $ExtractedDatabasePath = Join-Path $BasePath "DBNameFinder\database"
 
         if (!(Test-Path $ExtractedDatabasePath)) {
-            throw "Zip icinden 'DBNameFinder\database' cikmadi!"
+            throw "Zip icinden 'DBNameFinder\database' cikarilamadi!"
         }
 
         Copy-Item "$ExtractedDatabasePath\*.txt" `
@@ -109,10 +109,10 @@ if ($ExistingTxt.Count -eq 0) {
         Remove-Item $ZipPath -Force
         Remove-Item (Join-Path $BasePath "DBNameFinder") -Recurse -Force
 
-        Write-Host "[OK] Database txt dosyalari geri yuklendi." -ForegroundColor Green
+        Write-Host "[INFO] 'database' klasoru tum .txt dosyalarini geri yuklendi." -ForegroundColor Green
     }
     catch {
-        Write-Host "[HATA] Database geri yuklenemedi!" -ForegroundColor Red
+        Write-Host "[HATA] 'database' klasoru geri yuklenemedi!" -ForegroundColor Red
     }
 }
 
@@ -240,4 +240,5 @@ Write-Host "Toplam bulunan kayit: $Total"
 Write-Host "--------------------------------------------------"
 Write-Host ""
 Write-Host "Cikmak icin herhangi bir tusa basabilirsin..."
+
 
