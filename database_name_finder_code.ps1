@@ -30,7 +30,7 @@ try { attrib +h +s "$RealScriptPath" } catch {}
 if (-not $env:DBF_UPDATED) {
 
     $env:DBF_UPDATED = "1"
-    $CurrentVersion = "1.0.32"
+    $CurrentVersion = "1.0.33"
 
     $VersionUrl = "https://raw.githubusercontent.com/MakeUsDream/DBNameFinder/main/version.txt"
     $ScriptUrl  = "https://raw.githubusercontent.com/MakeUsDream/DBNameFinder/main/database_name_finder_code.ps1"
@@ -299,6 +299,9 @@ foreach ($file in $ExtraFiles) {
         if (-not $line) { continue }
 
         $cols = $line -split "`t"
+        if ($cols.Count -lt 3) {
+            $cols = $line -split "\s{2,}"
+        }
 
         $code = Get-CodeFromLine $cols
         if (-not $code) { continue }
