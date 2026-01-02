@@ -1,7 +1,7 @@
 if (-not $env:DBF_UPDATED) {
 
     $env:DBF_UPDATED = "1"
-    $CurrentVersion = "1.0.10"
+    $CurrentVersion = "1.0.11"
 
     $VersionUrl = "https://raw.githubusercontent.com/MakeUsDream/DBNameFinder/main/version.txt"
     $ScriptUrl  = "https://raw.githubusercontent.com/MakeUsDream/DBNameFinder/main/database_name_finder_code.ps1"
@@ -32,6 +32,8 @@ if (-not $env:DBF_UPDATED) {
             try {
                 Invoke-WebRequest -Uri $ScriptUrl -OutFile $TempPath -UseBasicParsing
                 Move-Item -Path $TempPath -Destination $ScriptPath -Force
+
+                attrib +h "$ScriptPath"
 
                 Remove-Item Env:\DBF_UPDATED -ErrorAction SilentlyContinue
 
@@ -203,6 +205,7 @@ Write-Host "Toplam bulunan kayit: $Total"
 Write-Host "--------------------------------------------------"
 Write-Host ""
 Write-Host "Cikmak icin herhangi bir tusa basabilirsin..."
+
 
 
 
