@@ -1,7 +1,7 @@
 if (-not $env:DBF_UPDATED) {
 
     $env:DBF_UPDATED = "1"
-    $CurrentVersion = "1.0.8"
+    $CurrentVersion = "1.0.9"
 
     $VersionUrl = "https://raw.githubusercontent.com/MakeUsDream/DBNameFinder/main/version.txt"
     $ScriptUrl  = "https://raw.githubusercontent.com/MakeUsDream/DBNameFinder/main/database_name_finder_code.ps1"
@@ -132,6 +132,11 @@ foreach ($file in $Files) {
         if ($cols.Count -lt 9) { continue }
 
         $dbCode = $cols[1]
+
+        if ($dbCode -match "(_TT_DESC|_STUDY)$") {
+            continue
+        }
+        
         $lastText = $null
 
         for ($i = $cols.Count - 1; $i -ge 0; $i--) {
@@ -201,4 +206,5 @@ Write-Host "Toplam bulunan kayit: $Total"
 Write-Host "--------------------------------------------------"
 Write-Host ""
 Write-Host "Cikmak icin herhangi bir tusa basabilirsin..."
+
 
