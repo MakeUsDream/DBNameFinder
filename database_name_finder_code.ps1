@@ -1,7 +1,7 @@
 if (-not $env:DBF_UPDATED) {
 
     $env:DBF_UPDATED = "1"
-    $CurrentVersion = "1.0.4"
+    $CurrentVersion = "1.0.5"
 
     $VersionUrl = "https://raw.githubusercontent.com/MakeUsDream/DBNameFinder/main/version.txt"
     $ScriptUrl  = "https://raw.githubusercontent.com/MakeUsDream/DBNameFinder/main/database_name_finder_code.ps1"
@@ -18,17 +18,10 @@ if (-not $env:DBF_UPDATED) {
 
     if ($LatestVersion -ne $CurrentVersion) {
 
-        Write-Host ""
-        Write-Host "--------------------------------------------" -ForegroundColor Yellow
         Write-Host "Yeni sürüm bulundu! ($LatestVersion)" -ForegroundColor Green
-        Write-Host "Mevcut sürüm: $CurrentVersion"
-        Write-Host "--------------------------------------------" -ForegroundColor Yellow
-
         $answer = Read-Host "Güncellemek ister misiniz? (Evet/Hayır)"
 
         if ($answer -match "^(e|evet)$") {
-
-            Clear-Host
 
             try {
                 $scriptContent = (Invoke-WebRequest $ScriptUrl -UseBasicParsing).Content
@@ -39,30 +32,19 @@ if (-not $env:DBF_UPDATED) {
                     [System.Text.Encoding]::GetEncoding(857)
                 )
 
-                Move-Item -Path $TempPath -Destination $ScriptPath -Force
+                Move-Item $TempPath $ScriptPath -Force
 
-                Write-Host ""
-                Write-Host "Güncelleme tamamlandı. Program yeniden başlatılıyor..." -ForegroundColor Green
+                Remove-Item Env:\DBF_UPDATED -ErrorAction SilentlyContinue
+
+                Write-Host "Güncelleme tamamlandı. Yeniden başlatılıyor..." -ForegroundColor Green
                 Start-Sleep 2
-
-                Clear-Host
 
                 powershell -ExecutionPolicy Bypass -File $ScriptPath
                 exit
             }
             catch {
                 Write-Host "Güncelleme başarısız oldu." -ForegroundColor Red
-                Start-Sleep 3
-
-                Clear-Host
             }
-        }
-        else {
-
-            Clear-Host
-
-            Write-Host "Güncelleme yapılmadı. Mevcut sürüm ile devam ediliyor." -ForegroundColor Cyan
-            Start-Sleep 2
         }
     }
 }
@@ -227,6 +209,3 @@ Write-Host "--------------------------------------------------"
 Write-Host ""
 Write-Host ""
 Write-Host "Çıkış yapmak için herhangi bir tuşa basabilirsin..."
-
-
-
