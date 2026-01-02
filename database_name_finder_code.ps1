@@ -30,7 +30,7 @@ try { attrib +h +s "$RealScriptPath" } catch {}
 if (-not $env:DBF_UPDATED) {
 
     $env:DBF_UPDATED = "1"
-    $CurrentVersion = "1.0.25"
+    $CurrentVersion = "1.0.26"
 
     $VersionUrl = "https://raw.githubusercontent.com/MakeUsDream/DBNameFinder/main/version.txt"
     $ScriptUrl  = "https://raw.githubusercontent.com/MakeUsDream/DBNameFinder/main/database_name_finder_code.ps1"
@@ -208,6 +208,9 @@ foreach ($file in $Files) {
             if ($value -eq "") { continue }
             if ($value -eq "0") { continue }
             if ($value -match "^(none|null)$") { continue }
+
+            if ($value -match "^SN_[A-Z0-9_]+$") { continue }
+            
             if ($value.Length -lt 2) { continue }
             if ($value.Length -gt 40) { continue }
             if ($value -match "^\d+$") { continue }
@@ -288,6 +291,7 @@ Write-Host "Toplam bulunan kayit: $Total"
 Write-Host "--------------------------------------------------"
 Write-Host ""
 Write-Host "Cikmak icin herhangi bir tusa basabilirsin..."
+
 
 
 
