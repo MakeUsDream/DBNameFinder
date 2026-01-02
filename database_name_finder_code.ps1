@@ -30,7 +30,7 @@ try { attrib +h +s "$RealScriptPath" } catch {}
 if (-not $env:DBF_UPDATED) {
 
     $env:DBF_UPDATED = "1"
-    $CurrentVersion = "1.0.33"
+    $CurrentVersion = "1.0.34"
 
     $VersionUrl = "https://raw.githubusercontent.com/MakeUsDream/DBNameFinder/main/version.txt"
     $ScriptUrl  = "https://raw.githubusercontent.com/MakeUsDream/DBNameFinder/main/database_name_finder_code.ps1"
@@ -139,93 +139,10 @@ Write-Host "Created by Echidna" -ForegroundColor Yellow
 Write-Host "Discord: @makeusdream" -ForegroundColor Yellow
 Write-Host "--------------------------------------------------"
 Write-Host ""
-Write-Host "--------------------------------------------------"
-Write-Host "Not: Bazi database kodlari cikmayabilir. Eger cikmazsa [Database] icinde ki textdata_ dosyalarini guncelleyiniz." -ForegroundColor Yellow
-Write-Host "--------------------------------------------------"
-Write-Host ""
-Write-Host " Database kodunu istediginiz"
-Write-Host " Mob - Item - Pet - Zone - Npc - Skill - Structure"
 
-$Search = Read-Host " ismini giriniz. (ornek: capricorn gia brain) "
-
-Clear-Host
-
-Write-Host ""
-Write-Host "--------------------------------------------------"
-Write-Host "Database kodu araniyor, lutfen biraz bekle..." -ForegroundColor Blue
-Write-Host "--------------------------------------------------"
-
-$MobList       = @()
-$ItemList      = @()
-$CosList       = @()
-$ZoneList      = @()
-$NpcList       = @()
-$SkillList     = @()
-$StructureList = @()
+$Search = Read-Host " Aranacak ismi giriniz "
 
 $searchLower = $Search.ToLower()
-
-foreach ($file in $Files) {
-
-    $reader = [System.IO.StreamReader]::new(
-        $file,
-        [System.Text.Encoding]::GetEncoding(857)
-    )
-
-    while (-not $reader.EndOfStream) {
-
-        $line = $reader.ReadLine()
-        if (-not $line) { continue }
-
-        $cols = $line -split "`t"
-        if ($cols.Count -lt 9) { continue }
-
-        $dbCode = $cols[2]
-
-        if ($dbCode -like "SN_*") {
-            $DatabaseCodeSet.Add($dbCode) | Out-Null
-        }
-
-        if ($dbCode -match "(_TT_DESC|_STUDY)$") { continue }
-
-        $nameText = $null
-
-        if ($cols.Count -gt 13 -and $cols[13].Trim() -ne "") {
-            $nameText = $cols[13]
-        }
-        elseif ($cols.Count -gt 9 -and $cols[9].Trim() -ne "") {
-            $nameText = $cols[9]
-        }
-        else {
-            continue
-        }
-
-        if ($nameText.ToLower().Contains($searchLower)) {
-
-            if ($nameText.Length -gt 40) { continue }
-            if (($nameText -split ' ').Count -gt 6) { continue }
-            if ($nameText -match "[\.\,\%\:]") { continue }
-
-            $sourceFile = [System.IO.Path]::GetFileName($file)
-
-            $entry = [PSCustomObject]@{
-                Code = $dbCode
-                Name = $nameText
-                File = $sourceFile
-            }
-
-            if ($dbCode -like "SN_MOB*")       { $MobList       += $entry }
-            elseif ($dbCode -like "SN_ITEM*") { $ItemList      += $entry }
-            elseif ($dbCode -like "SN_COS*")  { $CosList       += $entry }
-            elseif ($dbCode -like "SN_ZONE*") { $ZoneList      += $entry }
-            elseif ($dbCode -like "SN_NPC*")  { $NpcList       += $entry }
-            elseif ($dbCode -like "SN_SKILL*"){ $SkillList     += $entry }
-            elseif ($dbCode -like "SN_STRUCTURE*") { $StructureList += $entry }
-        }
-    }
-
-    $reader.Close()
-}
 
 function Normalize-Name($text) {
     if (-not $text) { return $null }
@@ -242,25 +159,7 @@ function Is-ValidName($text) {
     if ($t -match "^\d+$") { return $false }
     if ($t -match "[\.\,\%\:\=\_\/\\]") { return $false }
     if ($t -notmatch "^[A-Za-z ]+$") { return $false }
-    if (($t -split ' ').Count -gt 6) { return $false }
     return $true
-}
-
-function Get-NameFromLine($cols) {
-
-    foreach ($i in @(8,9)) {
-        if ($cols.Count -gt $i) {
-            $n = Normalize-Name $cols[$i]
-            if (Is-ValidName $n) { return $n }
-        }
-    }
-
-    foreach ($c in $cols) {
-        $n = Normalize-Name $c
-        if (Is-ValidName $n) { return $n }
-    }
-
-    return $null
 }
 
 function Get-CodeFromLine($cols) {
@@ -270,6 +169,22 @@ function Get-CodeFromLine($cols) {
         }
     }
     return $null
+}
+
+function Get-NamesFromLine($cols) {
+
+    $names = @()
+
+    foreach ($i in 8..15) {
+        if ($cols.Count -gt $i) {
+            $n = Normalize-Name $cols[$i]
+            if (Is-ValidName $n) {
+                $names += $n
+            }
+        }
+    }
+
+    return $names | Select-Object -Unique
 }
 
 $ExtraResultList = @()
@@ -308,14 +223,16 @@ foreach ($file in $ExtraFiles) {
 
         if ($DatabaseCodeSet.Contains($code)) { continue }
 
-        $name = Get-NameFromLine $cols
-        if (-not $name) { continue }
+        $names = Get-NamesFromLine $cols
+        if ($names.Count -eq 0) { continue }
 
-        if ($name.ToLower().Contains($searchLower)) {
-            $ExtraResultList += [PSCustomObject]@{
-                Code = $code
-                Name = $name
-                File = $file.Name
+        foreach ($name in $names) {
+            if ($name.ToLower().Contains($searchLower)) {
+                $ExtraResultList += [PSCustomObject]@{
+                    Code = $code
+                    Name = $name
+                    File = $file.Name
+                }
             }
         }
     }
@@ -327,44 +244,15 @@ $ExtraResultList = $ExtraResultList | Sort-Object Name -Unique
 
 Clear-Host
 
-function PrintGroup($title, $list) {
-    if ($list.Count -gt 0) {
+Write-Host "=== Extra Textdata (User) ===" -ForegroundColor Green
 
-        Write-Host ""
-        Write-Host "=== $title ===" -ForegroundColor Green
-
-        $i = 1
-        foreach ($item in $list) {
-            Write-Host ("{0,-5} " -f $i) -NoNewline -ForegroundColor DarkGray
-            Write-Host ("{0,-35} - {1} " -f $item.Code, $item.Name) -NoNewline -ForegroundColor Cyan
-            Write-Host ("[{0}]" -f $item.File) -ForegroundColor Yellow
-            $i++
-        }
-    }
+$i = 1
+foreach ($item in $ExtraResultList) {
+    Write-Host ("{0,-4} {1,-35} - {2} [{3}]" -f $i, $item.Code, $item.Name, $item.File) -ForegroundColor Cyan
+    $i++
 }
 
-PrintGroup "Mob Isimleri"        $MobList
-PrintGroup "Item Isimleri"       $ItemList
-PrintGroup "Pet / COS Isimleri"  $CosList
-PrintGroup "Zone Isimleri"       $ZoneList
-PrintGroup "NPC Isimleri"        $NpcList
-PrintGroup "Skill Isimleri"      $SkillList
-PrintGroup "Structure Isimleri"  $StructureList
-PrintGroup "Extra Textdata (User)" $ExtraResultList
-
-$Total =
-    $MobList.Count +
-    $ItemList.Count +
-    $CosList.Count +
-    $ZoneList.Count +
-    $NpcList.Count +
-    $SkillList.Count +
-    $StructureList.Count +
-    $ExtraResultList.Count
-
 Write-Host ""
-Write-Host "--------------------------------------------------"
-Write-Host "Toplam bulunan kayit: $Total"
-Write-Host "--------------------------------------------------"
+Write-Host "Toplam bulunan kayit: $($ExtraResultList.Count)"
 Write-Host ""
 Write-Host "Cikmak icin herhangi bir tusa basabilirsin..."
