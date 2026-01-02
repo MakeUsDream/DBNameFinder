@@ -1,7 +1,7 @@
 if (-not $env:DBF_UPDATED) {
 
     $env:DBF_UPDATED = "1"
-    $CurrentVersion = "1.0.7"
+    $CurrentVersion = "1.0.8"
 
     $VersionUrl = "https://raw.githubusercontent.com/MakeUsDream/DBNameFinder/main/version.txt"
     $ScriptUrl  = "https://raw.githubusercontent.com/MakeUsDream/DBNameFinder/main/database_name_finder_code.ps1"
@@ -68,7 +68,7 @@ $DatabasePath = Join-Path $BasePath "database"
 
 if (!(Test-Path $DatabasePath)) {
     New-Item -ItemType Directory -Path $DatabasePath -Force | Out-Null
-    Write-Host "[Bilgi] 'database' klasörü bulunamadı, otomatik oluşturuldu." -ForegroundColor Yellow
+    Write-Host "[Bilgi] 'database' klasoru bulunamadi, otomatik olarak olusturuldu." -ForegroundColor Yellow
 }
 
 $Files = @(
@@ -78,8 +78,8 @@ $Files = @(
 
 foreach ($f in $Files) {
     if (!(Test-Path $f)) {
-        Write-Host "Maalesef, dosya bulunamadı: $f" -ForegroundColor Red
-        Write-Host "Çıkış yapmak için herhangi bir tuşa basın..."
+        Write-Host "Maalesef, dosya bulunamadi: $f" -ForegroundColor Red
+        Write-Host "Cikmak icin herhangi bir tusa basabilirsin..."
         $null = $Host.UI.RawUI.ReadKey("NoEcho,IncludeKeyDown")
         exit 1
     }
@@ -201,5 +201,3 @@ Write-Host "Toplam bulunan kayit: $Total"
 Write-Host "--------------------------------------------------"
 Write-Host ""
 Write-Host "Cikmak icin herhangi bir tusa basabilirsin..."
-
-
