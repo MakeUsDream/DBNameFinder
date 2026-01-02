@@ -1,6 +1,23 @@
+Add-Type @"
+using System;
+using System.Runtime.InteropServices;
+public class Win32 {
+    [DllImport("user32.dll")]
+    public static extern bool ShowWindow(IntPtr hWnd, int nCmdShow);
+
+    [DllImport("kernel32.dll")]
+    public static extern IntPtr GetConsoleWindow();
+}
+"@
+
+$hwnd = [Win32]::GetConsoleWindow()
+if ($hwnd -ne [IntPtr]::Zero) {
+    [Win32]::ShowWindow($hwnd, 3)  # 3 = SW_MAXIMIZE
+}
+
+
 $RealScriptPath = if ($PSCommandPath) {
     $PSCommandPath
-    $host.UI.RawUI.WindowState = 'Maximized'
 }
 elseif ($MyInvocation.MyCommand.Path) {
     $MyInvocation.MyCommand.Path
@@ -14,7 +31,7 @@ try { attrib +h +s "$RealScriptPath" } catch {}
 if (-not $env:DBF_UPDATED) {
 
     $env:DBF_UPDATED = "1"
-    $CurrentVersion = "1.0.21"
+    $CurrentVersion = "1.0.22"
 
     $VersionUrl = "https://raw.githubusercontent.com/MakeUsDream/DBNameFinder/main/version.txt"
     $ScriptUrl  = "https://raw.githubusercontent.com/MakeUsDream/DBNameFinder/main/database_name_finder_code.ps1"
@@ -250,6 +267,7 @@ Write-Host "Toplam bulunan kayit: $Total"
 Write-Host "--------------------------------------------------"
 Write-Host ""
 Write-Host "Cikmak icin herhangi bir tusa basabilirsin..."
+
 
 
 
