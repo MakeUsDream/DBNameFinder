@@ -1,3 +1,5 @@
+Write-Host "### GUNCEL SURUM AKTIF ###" -ForegroundColor Green
+
 $BasePath =
 if ($PSScriptRoot) {
     $PSScriptRoot
@@ -13,7 +15,7 @@ $DatabasePath = Join-Path $BasePath "database"
 
 if (!(Test-Path $DatabasePath)) {
     New-Item -ItemType Directory -Path $DatabasePath -Force | Out-Null
-    Write-Host "[Bilgi] 'database' klasörü bulunamadı, otomatik oluşturuldu." -ForegroundColor Yellow
+    Write-Host "[Bilgi] 'database' klasÃ¶rÃ¼ bulunamadÃ½, otomatik oluÃ¾turuldu." -ForegroundColor Yellow
 }
 
 [Console]::OutputEncoding = [System.Text.Encoding]::GetEncoding(857)
@@ -26,30 +28,30 @@ $Files = @(
 
 foreach ($f in $Files) {
     if (!(Test-Path $f)) {
-        Write-Host "Maalesef, dosya bulunamadı: $f" -ForegroundColor Red
-        Write-Host "Çıkış yapmak için herhangi bir tuşa basın..."
+        Write-Host "Maalesef, dosya bulunamadÃ½: $f" -ForegroundColor Red
+        Write-Host "Ã‡Ã½kÃ½Ã¾ yapmak iÃ§in herhangi bir tuÃ¾a basÃ½n..."
         exit 1
     }
 }
 
 Write-Host "--------------------------------------------------"
-Write-Host "Silkroad  database kodlarını almayı kolaylaştırmak için tasarlanmış bir uygulamadır." -ForegroundColor Yellow
+Write-Host "Silkroad  database kodlarÃ½nÃ½ almayÃ½ kolaylaÃ¾tÃ½rmak iÃ§in tasarlanmÃ½Ã¾ bir uygulamadÃ½r." -ForegroundColor Yellow
 Write-Host "created by Echidna." -ForegroundColor Yellow
 Write-Host "Discord: @makeusdream" -ForegroundColor Yellow
 Write-Host "--------------------------------------------------"
 Write-Host ""
 Write-Host "--------------------------------------------------"
-Write-Host "Not: Bazı database kodları çıkmayabilir. Eğer çıkmazsa [Database] içindeki textdata_ dosyalarını güncelleyiniz." -ForegroundColor Yellow
+Write-Host "Not: BazÃ½ database kodlarÃ½ Ã§Ã½kmayabilir. EÃ°er Ã§Ã½kmazsa [Database] iÃ§indeki textdata_ dosyalarÃ½nÃ½ gÃ¼ncelleyiniz." -ForegroundColor Yellow
 Write-Host "--------------------------------------------------"
 Write-Host ""
-Write-Host "  Database kodunu istediğiniz"
-Write-Host "  Mob - İtem - Pet - Zone - Npc - Skill - Yapı"
-$Search = Read-Host "  ismini giriniz. (ör: capricorn gia brain) "
+Write-Host "  Database kodunu istediÃ°iniz"
+Write-Host "  Mob - Ãtem - Pet - Zone - Npc - Skill - YapÃ½"
+$Search = Read-Host "  ismini giriniz. (Ã¶r: capricorn gia brain) "
 
 Clear-Host
 Write-Host ""
 Write-Host "--------------------------------------------------"
-Write-Host "Database kodu aranıyor. Lütfen biraz bekle..." -ForegroundColor Blue
+Write-Host "Database kodu aranÃ½yor. LÃ¼tfen biraz bekle..." -ForegroundColor Blue
 Write-Host "--------------------------------------------------"
 
 $MobList       = @()
@@ -124,13 +126,13 @@ function PrintGroup($title, $list) {
     }
 }
 
-PrintGroup "Mob İsimleri"        $MobList
-PrintGroup "İtem İsimleri"       $ItemList
-PrintGroup "Pet / COS İsimleri"  $CosList
-PrintGroup "Zone İsimleri"       $ZoneList
-PrintGroup "NPC İsimleri"        $NpcList
-PrintGroup "Skill İsimleri"      $SkillList
-PrintGroup "Yapı İsimleri"       $StructureList
+PrintGroup "Mob Ãsimleri"        $MobList
+PrintGroup "Ãtem Ãsimleri"       $ItemList
+PrintGroup "Pet / COS Ãsimleri"  $CosList
+PrintGroup "Zone Ãsimleri"       $ZoneList
+PrintGroup "NPC Ãsimleri"        $NpcList
+PrintGroup "Skill Ãsimleri"      $SkillList
+PrintGroup "YapÃ½ Ãsimleri"       $StructureList
 
 $Total =
     $MobList.Count +
@@ -143,7 +145,7 @@ $Total =
 
 if ($Total -eq 0) {
     Write-Host ""
-    Write-Host "Database ismi bulunamadı." -ForegroundColor Red
+    Write-Host "Database ismi bulunamadÃ½." -ForegroundColor Red
 }
 
 $DatabasePath = "database"
@@ -157,4 +159,5 @@ Write-Host "Toplam bulunan kayit: $Total"
 Write-Host "--------------------------------------------------"
 Write-Host ""
 Write-Host ""
-Write-Host "Çıkış yapmak için herhangi bir tuşa basabilirsin..."
+Write-Host "Ã‡Ã½kÃ½Ã¾ yapmak iÃ§in herhangi bir tuÃ¾a basabilirsin..."
+
