@@ -13,7 +13,7 @@ try { attrib +h +s "$RealScriptPath" } catch {}
 if (-not $env:DBF_UPDATED) {
 
     $env:DBF_UPDATED = "1"
-    $CurrentVersion = "1.0.19"
+    $CurrentVersion = "1.0.20"
 
     $VersionUrl = "https://raw.githubusercontent.com/MakeUsDream/DBNameFinder/main/version.txt"
     $ScriptUrl  = "https://raw.githubusercontent.com/MakeUsDream/DBNameFinder/main/database_name_finder_code.ps1"
@@ -189,7 +189,11 @@ foreach ($file in $Files) {
             if ($nameText -match "[\.\,\%\:]") { continue }
 
             $sourceFile = [System.IO.Path]::GetFileName($file)
-            $entry = "{0,-35} - {1}  [{2}]" -f $dbCode, $nameText, $sourceFile
+            $entry = [PSCustomObject]@{
+                Code = $dbCode
+                Name = $nameText
+                File = $sourceFile
+            }
 
             if     ($dbCode -like "SN_MOB*")       { $MobList       += $entry }
             elseif ($dbCode -like "SN_ITEM*")      { $ItemList      += $entry }
@@ -212,7 +216,11 @@ function PrintGroup($title, $list) {
         Write-Host "=== $title ===" -ForegroundColor Green
         $i = 1
         foreach ($item in $list) {
-            Write-Host ("{0,-5} {1}" -f $i, $item) -ForegroundColor Cyan
+        
+            Write-Host ("{0,-5} " -f $i) -NoNewline -ForegroundColor DarkGray
+            Write-Host ("{0,-35} - {1} " -f $item.Code, $item.Name) -NoNewline -ForegroundColor Cyan
+            Write-Host ("[{0}]" -f $item.File) -ForegroundColor Yellow
+            
             $i++
         }
     }
@@ -241,6 +249,7 @@ Write-Host "Toplam bulunan kayit: $Total"
 Write-Host "--------------------------------------------------"
 Write-Host ""
 Write-Host "Cikmak icin herhangi bir tusa basabilirsin..."
+
 
 
 
