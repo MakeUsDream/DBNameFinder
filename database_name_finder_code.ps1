@@ -13,7 +13,7 @@ try { attrib +h +s "$RealScriptPath" } catch {}
 if (-not $env:DBF_UPDATED) {
 
     $env:DBF_UPDATED = "1"
-    $CurrentVersion = "1.0.17"
+    $CurrentVersion = "1.0.18"
 
     $VersionUrl = "https://raw.githubusercontent.com/MakeUsDream/DBNameFinder/main/version.txt"
     $ScriptUrl  = "https://raw.githubusercontent.com/MakeUsDream/DBNameFinder/main/database_name_finder_code.ps1"
@@ -89,24 +89,25 @@ if ($ExistingTxt.Count -eq 0) {
     Write-Host ""
     Write-Host "[Bilgi] 'database' klasoru bos. Kodlar indiriliyor..." -ForegroundColor Yellow
 
-    $ZipUrl  = "https://raw.githubusercontent.com/MakeUsDream/DBNameFinder/main/database.zip"
-    $ZipPath = Join-Path $BasePath "database.zip"
+    $ZipUrl  = "https://raw.githubusercontent.com/MakeUsDream/DBNameFinder/main/DBNameFinder.zip"
+    $ZipPath = Join-Path $BasePath "DBNameFinder.zip"
 
     try {
         Invoke-WebRequest -Uri $ZipUrl -OutFile $ZipPath -UseBasicParsing
 
         Expand-Archive -Path $ZipPath -DestinationPath $BasePath -Force
 
-        $ZipDatabasePath = Join-Path $BasePath "database"
+        $ExtractedDatabasePath = Join-Path $BasePath "DBNameFinder\database"
 
-        if (!(Test-Path $ZipDatabasePath)) {
-            throw "Zip icinden 'database' klasoru cikmadi!"
+        if (!(Test-Path $ExtractedDatabasePath)) {
+            throw "Zip icinden 'DBNameFinder\database' cikmadi!"
         }
 
-        Copy-Item "$ZipDatabasePath\*.txt" `
+        Copy-Item "$ExtractedDatabasePath\*.txt" `
                   -Destination $DatabasePath -Force
 
         Remove-Item $ZipPath -Force
+        Remove-Item (Join-Path $BasePath "DBNameFinder") -Recurse -Force
 
         Write-Host "[OK] Database txt dosyalari geri yuklendi." -ForegroundColor Green
     }
@@ -239,3 +240,4 @@ Write-Host "Toplam bulunan kayit: $Total"
 Write-Host "--------------------------------------------------"
 Write-Host ""
 Write-Host "Cikmak icin herhangi bir tusa basabilirsin..."
+
